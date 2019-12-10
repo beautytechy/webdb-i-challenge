@@ -63,6 +63,43 @@ router.post("/", (req, res) => {
     });
 });
 
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+
+  // validate the data
+  knex("accounts")
+    .where({ id }) // ALWAYS FILTER ON UPDATE (AND DELETE)
+    .update(changes)
+    .then(count => {
+      if (count > 0) {
+        res.status(200).json({ message: `${count} record(s) updated` });
+      } else {
+        res.status(404).json({ message: "Account not found" });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        errorMessage: "Error updating the account"
+      });
+    });
+});
+
+router.delete("/:id", (req, res) => {
+  knex("accounts")
+    .where({ id: req.params.id }) // ALWAYS FILTER ON UPDATE (AND DELETE)
+    .del()
+    .then(count => {
+      res.status(200).json({ message: `${count} record(s) removed` });
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        errorMessage: "Error removing the account"
+      });
+    });
+});
 
 
 module.exports = router;
